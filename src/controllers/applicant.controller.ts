@@ -1,3 +1,5 @@
+import { NextFunction } from 'express';
+
 class ApplicantController {
     public createOne() {
 

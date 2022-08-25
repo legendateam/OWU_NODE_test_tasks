@@ -1,7 +1,9 @@
-import { ApplicationToAdd } from '../../types/applicant-to-add.type';
-import { Position } from '../../types/position.type';
+import { PositionParamsId } from '../../types';
+import { IPositionModel } from '../models/position.model.interface';
+import { IPositionToAdd } from '../position-to-add.interface';
 
 export interface IPositionAbstraction {
-    createOne(position: ApplicationToAdd): Promise<Position>,
-    getAll(): Promise<Position[]>
+    createOne(position: IPositionToAdd): Promise<IPositionModel>,
+    getAll(): Promise<IPositionModel[]>,
+    getOne({ position_id }: PositionParamsId): Promise<IPositionModel | null>
 }
