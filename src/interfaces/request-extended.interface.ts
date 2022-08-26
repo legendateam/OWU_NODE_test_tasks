@@ -1,7 +1,9 @@
 import { Request } from 'express';
 
-import { PositionToAdd } from '../types';
+import { PositionParamsId, PositionToAdd, PositionToPatch } from '../types';
 
 export interface IRequestExtended extends Request{
-    position?: PositionToAdd
+    positionToAdd?: PositionToAdd,
+    positionToPatch?: PositionToPatch,
+    _id?: PositionParamsId
 }

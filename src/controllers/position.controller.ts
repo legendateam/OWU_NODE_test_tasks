@@ -1,11 +1,11 @@
-import { NextFunction, Request, Response } from 'express';
+import {NextFunction, Request, Response} from 'express';
 
-import { positionRepository } from '../repositories/position.repository';
-import { HttpStatusEnum } from '../enums';
-import { CustomError } from '../errors';
-import { errorsMessagesConstant } from '../constants';
-import { PositionParamsId, PositionToAdd } from '../types';
-import { IRequestExtended } from '../interfaces';
+import {positionRepository} from '../repositories/position.repository';
+import {HttpStatusEnum} from '../enums';
+import {CustomError} from '../errors';
+import {errorsMessagesConstant} from '../constants';
+import {PositionToAdd} from '../types';
+import {IRequestExtended} from '../interfaces';
 
 class PositionController {
     public async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -23,9 +23,9 @@ class PositionController {
         }
     }
 
-    public async getOne(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public async getOne(req: IRequestExtended, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { position_id } = req.params as PositionParamsId;
+            const { position_id } = req._id!;
 
             const position = await positionRepository.getOne({ position_id });
 
@@ -42,7 +42,7 @@ class PositionController {
 
     public async createOne(req: IRequestExtended, res: Response, next: NextFunction): Promise<void> {
         try {
-            const position = req.position as PositionToAdd;
+            const position = req.positionToAdd as PositionToAdd;
             const positionCreated = await positionRepository.createOne({ position });
 
             if (!positionCreated) {
@@ -57,12 +57,38 @@ class PositionController {
         }
     }
 
-    public updateOnePartial() {
+    public async updateOnePartial(req: IRequestExtended, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { position_id } = req._id!;
+            const updatesFields = req.positionToPatch!;
 
+            const positionUpdated = await positionRepository.updateField({ position_id, updatesFields });
+            if (!positionUpdated) {
+                next(new CustomError(errorsMessagesConstant.notUpdatedPosition, HttpStatusEnum.NOT_IMPLEMENTED));
+                return;
+            }
+
+            res.status(HttpStatusEnum.OK).end();
+        } catch (e) {
+            next(e);
+        }
     }
 
-    public deleteOne() {
+    public async deleteOne(req: IRequestExtended, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { position_id } = req._id!;
 
+            const positionDeleted = await positionRepository.deleteOne({ position_id });
+
+            if (!positionDeleted.deletedCount) {
+                next(new CustomError(errorsMessagesConstant.notDelete, HttpStatusEnum.NOT_IMPLEMENTED));
+                return;
+            }
+
+            res.status(HttpStatusEnum.NO_CONTENT).end();
+        } catch (e) {
+            next(e);
+        }
     }
 }
 

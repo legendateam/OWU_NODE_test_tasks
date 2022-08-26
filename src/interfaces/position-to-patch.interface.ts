@@ -1,5 +1,5 @@
-import { PositionToPatch } from '../types';
+import { PositionParamsId, PositionToPatch } from '../types';
 
-export interface IPositionToPatch {
-    position: PositionToPatch
+export interface IPositionToPatch extends PositionParamsId{
+    updatesFields: PositionToPatch
 }
