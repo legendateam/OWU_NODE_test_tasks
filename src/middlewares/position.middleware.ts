@@ -1,8 +1,10 @@
 import { NextFunction, Response } from 'express';
 
 import { IRequestExtended } from '../interfaces';
-import { PositionParamsId, PositionToAdd, PositionToPatch } from '../types';
-import { positionToAddSchema, positionToPatchSchema } from '../utils';
+import {
+    PositionParamsId, PositionToAdd, PositionToPatch, QueryParams,
+} from '../types';
+import { positionSearchParams, positionToAddSchema, positionToPatchSchema } from '../utils';
 import { CustomError } from '../errors';
 import { HttpStatusEnum } from '../enums';
 import { errorsMessagesConstant } from '../constants';
@@ -60,6 +62,36 @@ class PositionMiddleware {
             if (!position) {
                 next(new CustomError(errorsMessagesConstant.notFoundPositions, HttpStatusEnum.NOT_FOUND));
                 return;
+            }
+
+            next();
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    public isQueryParams(req: IRequestExtended, _: Response, next: NextFunction):void {
+        try {
+            const { tag, level, category } = req.query as QueryParams;
+
+            const { error, value } = positionSearchParams.validate({ tag, level, category });
+
+            if (error) {
+                next(new CustomError(errorsMessagesConstant.badRequest, HttpStatusEnum.BAD_REQUEST));
+                return;
+            }
+
+            if (value) {
+                const { tag, level, category } = value;
+
+                if (tag && !level && !category) req.searchParams = { tag };
+                if (level && !tag && !category) req.searchParams = { level };
+                if (category && !tag && !level) req.searchParams = { category };
+
+                if (tag && level && !category) req.searchParams = { tag, level };
+                if (tag && category && !level) req.searchParams = { tag, category };
+                if (!tag && category && level) req.searchParams = { category, level };
+                if (tag && level && category) req.searchParams = { tag, level, category };
             }
 
             next();

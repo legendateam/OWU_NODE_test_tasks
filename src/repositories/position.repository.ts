@@ -1,7 +1,7 @@
 import { PositionModel } from '../models/Position.model';
 import {
     IDeleteFromDb,
-    IPositionAbstraction, IPositionModel, IPositionToAdd, IPositionToPatch,
+    IPositionAbstraction, IPositionModel, IPositionToAdd, IPositionToPatch, IQueryParams,
 } from '../interfaces';
 import { PositionParamsId } from '../types';
 
@@ -12,6 +12,16 @@ class PositionRepository implements IPositionAbstraction {
 
     public async getAll(): Promise<IPositionModel[]> {
         return PositionModel.find();
+    }
+
+    public async getAllByFilters(params: IQueryParams): Promise<IPositionModel[] | null> {
+        return PositionModel.find(
+            {
+                category: params?.category,
+                level: params?.level,
+                description: { $regex: params?.tag, $options: 'i' },
+            },
+        );
     }
 
     public async getOne({ position_id }: PositionParamsId): Promise<IPositionModel | null> {

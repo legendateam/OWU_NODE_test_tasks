@@ -5,3 +5,4 @@ export * from './position.type';
 export * from './position-params-id-.type';
 export * from './position-to-add.type';
 export * from './position-to-patch.type';
+export * from './query-params.type';

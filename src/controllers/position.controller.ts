@@ -1,15 +1,29 @@
-import {NextFunction, Request, Response} from 'express';
+import { NextFunction, Request, Response } from 'express';
 
-import {positionRepository} from '../repositories/position.repository';
-import {HttpStatusEnum} from '../enums';
-import {CustomError} from '../errors';
-import {errorsMessagesConstant} from '../constants';
-import {PositionToAdd} from '../types';
-import {IRequestExtended} from '../interfaces';
+import { positionRepository } from '../repositories/position.repository';
+import { HttpStatusEnum } from '../enums';
+import { CustomError } from '../errors';
+import { errorsMessagesConstant } from '../constants';
+import { PositionToAdd } from '../types';
+import { IRequestExtended } from '../interfaces';
 
 class PositionController {
-    public async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public async getAll(req: IRequestExtended, res: Response, next: NextFunction): Promise<void> {
         try {
+            const params = req.searchParams;
+
+            if (params) {
+                const allPositionsByFilters = await positionRepository.getAllByFilters(params);
+
+                if (!allPositionsByFilters) {
+                    next(new CustomError(errorsMessagesConstant.notFoundPositions, HttpStatusEnum.NOT_FOUND));
+                    return;
+                }
+
+                res.status(HttpStatusEnum.OK).json(allPositionsByFilters);
+                return;
+            }
+
             const positions = await positionRepository.getAll();
 
             if (!positions) {

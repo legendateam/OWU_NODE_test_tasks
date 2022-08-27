@@ -7,4 +7,5 @@ export * from './config.interface';
 export * from './delete-from-db.interface';
 export * from './position-to-add.interface';
 export * from './position-to-patch.interface';
+export * from './query-params.interface';
 export * from './request-extended.interface';

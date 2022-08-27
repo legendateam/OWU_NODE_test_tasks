@@ -5,4 +5,5 @@ export const errorsMessagesConstant = {
     notUpdatedPosition: 'Not Updated Position',
     missingParams: 'Missing params',
     notDelete: 'Not delete',
+    badRequest: 'Bad Request',
 };
