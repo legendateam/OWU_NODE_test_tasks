@@ -73,6 +73,7 @@ class PositionController {
                     position_company: positionCreated.company,
                     position_level: positionCreated.level,
                     position_japaneseRequired: `${positionCreated.japaneseRequired}`,
+                    position_description: positionCreated?.description,
                 });
             });
 
@@ -115,11 +116,12 @@ class PositionController {
             const applicants = await applicantService.getAllByFiltersForEmailSend(position);
 
             applicants?.forEach((applicant) => {
-                emailService.sendMessage(applicant.email, EmailTypeTemplateEnum.NEW_POSITION, {
+                emailService.sendMessage(applicant.email, EmailTypeTemplateEnum.REMOVE_POSITION, {
                     position_category: position.category,
                     position_company: position.company,
                     position_level: position.level,
                     position_japaneseRequired: `${position.japaneseRequired}`,
+                    position_description: position?.description,
                 });
             });
 

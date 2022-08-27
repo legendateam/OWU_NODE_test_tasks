@@ -3,6 +3,7 @@ import {
     IApplicantAbstraction, IApplicantInteresting, IApplicantModel, IApplicantToSet, IDeleteFromDb,
 } from '../interfaces';
 import { ApplicantParamsId, ApplicationToAdd } from '../types';
+import { CategoriesEnum } from '../enums';
 
 class ApplicantRepository implements IApplicantAbstraction {
     public async getOneByEmail(email: string): Promise<IApplicantModel | null> {
@@ -25,10 +26,10 @@ class ApplicantRepository implements IApplicantAbstraction {
         return ApplicantModel.findByIdAndUpdate(_id, applicantToSet);
     }
 
-    public async getAllByFilters({ level, category, japaneseKnowledge }: IApplicantInteresting): Promise<IApplicantModel[] | null> {
+    public async getAllByFilters(filters: IApplicantInteresting, category: CategoriesEnum)
+        : Promise<IApplicantModel[] | null> {
         return ApplicantModel.find({
-            japaneseKnowledge,
-            level,
+            ...filters,
             categories: { $in: [category] },
         });
     }

@@ -1,7 +1,7 @@
 import { emailTemplate, config, transporter } from '../configs';
 import { emailTemplateConstant } from '../constants';
 import { EmailTypeTemplateEnum } from '../enums';
-import { IApplicantModel, IEmailCommonContext, IEmailContext } from '../interfaces';
+import { IEmailCommonContext, IEmailContext } from '../interfaces';
 
 class EmailService {
     public async sendMessage(email: string, type: EmailTypeTemplateEnum, context: IEmailContext): Promise<void> {

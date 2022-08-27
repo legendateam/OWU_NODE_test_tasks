@@ -6,10 +6,10 @@ export class ApplicantService {
         : Promise<IApplicantModel[] | null> {
         if (!japaneseRequired) {
             return applicantRepository
-                .getAllByFilters({ category, level });
+                .getAllByFilters({ level }, category);
         }
         return applicantRepository
-            .getAllByFilters({ category, level, japaneseKnowledge: japaneseRequired });
+            .getAllByFilters({ level, japaneseKnowledge: japaneseRequired }, category);
     }
 }
 
