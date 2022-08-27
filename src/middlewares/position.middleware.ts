@@ -67,6 +67,7 @@ class PositionMiddleware {
                 return;
             }
 
+            req.positionModel = position;
             next();
         } catch (e) {
             next(e);

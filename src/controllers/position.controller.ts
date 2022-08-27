@@ -1,12 +1,12 @@
 import { NextFunction, Response } from 'express';
 
 import { positionRepository } from '../repositories';
-import { HttpStatusEnum } from '../enums';
+import { EmailTypeTemplateEnum, HttpStatusEnum } from '../enums';
 import { CustomError } from '../errors';
 import { errorsMessagesConstant } from '../constants';
 import { PositionParamsId, PositionToAdd } from '../types';
 import { IRequestExtended } from '../interfaces';
-import { positionService } from '../services';
+import { applicantService, emailService, positionService } from '../services';
 
 class PositionController {
     public async getAll(req: IRequestExtended, res: Response, next: NextFunction): Promise<void> {
@@ -65,6 +65,17 @@ class PositionController {
                 return;
             }
 
+            const applicants = await applicantService.getAllByFiltersForEmailSend(positionCreated);
+
+            applicants?.forEach((applicant) => {
+                emailService.sendMessage(applicant.email, EmailTypeTemplateEnum.NEW_POSITION, {
+                    position_category: positionCreated.category,
+                    position_company: positionCreated.company,
+                    position_level: positionCreated.level,
+                    position_japaneseRequired: `${positionCreated.japaneseRequired}`,
+                });
+            });
+
             const id = positionCreated._id;
             res.status(HttpStatusEnum.CREATED).location(`${id}`).end();
         } catch (e) {
@@ -92,6 +103,7 @@ class PositionController {
     public async deleteOne(req: IRequestExtended, res: Response, next: NextFunction): Promise<void> {
         try {
             const { position_id } = req._id as PositionParamsId;
+            const position = req.positionModel!;
 
             const positionDeleted = await positionRepository.deleteOne({ position_id });
 
@@ -99,6 +111,17 @@ class PositionController {
                 next(new CustomError(errorsMessagesConstant.notDelete, HttpStatusEnum.NOT_IMPLEMENTED));
                 return;
             }
+
+            const applicants = await applicantService.getAllByFiltersForEmailSend(position);
+
+            applicants?.forEach((applicant) => {
+                emailService.sendMessage(applicant.email, EmailTypeTemplateEnum.NEW_POSITION, {
+                    position_category: position.category,
+                    position_company: position.company,
+                    position_level: position.level,
+                    position_japaneseRequired: `${position.japaneseRequired}`,
+                });
+            });
 
             res.status(HttpStatusEnum.NO_CONTENT).end();
         } catch (e) {

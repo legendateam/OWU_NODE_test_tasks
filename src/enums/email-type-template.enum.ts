@@ -1,3 +1,4 @@
 export enum EmailTypeTemplateEnum {
-    ASDASD
+    NEW_POSITION,
+    REMOVE_POSITION
 }

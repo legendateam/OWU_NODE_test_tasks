@@ -1,0 +1,13 @@
+header, footer {
+    height: 80px;
+    display: flex;
+    background-color: purple;
+}
+
+header {
+    justify-content: center;
+}
+
+footer {
+    justify-content: space-around;
+}

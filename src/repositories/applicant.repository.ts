@@ -1,6 +1,6 @@
 import { ApplicantModel } from '../models/Applicant.model';
 import {
-    IApplicantAbstraction, IApplicantModel, IApplicantToSet, IDeleteFromDb,
+    IApplicantAbstraction, IApplicantInteresting, IApplicantModel, IApplicantToSet, IDeleteFromDb,
 } from '../interfaces';
 import { ApplicantParamsId, ApplicationToAdd } from '../types';
 
@@ -23,6 +23,14 @@ class ApplicantRepository implements IApplicantAbstraction {
 
     public async updateFullFields({ _id, applicantToSet }: IApplicantToSet): Promise<IApplicantModel | null> {
         return ApplicantModel.findByIdAndUpdate(_id, applicantToSet);
+    }
+
+    public async getAllByFilters({ level, category, japaneseKnowledge }: IApplicantInteresting): Promise<IApplicantModel[] | null> {
+        return ApplicantModel.find({
+            japaneseKnowledge,
+            level,
+            categories: { $in: [category] },
+        });
     }
 }
 export const applicantRepository = new ApplicantRepository();
