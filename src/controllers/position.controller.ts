@@ -1,11 +1,12 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 
-import { positionRepository } from '../repositories/position.repository';
+import { positionRepository } from '../repositories';
 import { HttpStatusEnum } from '../enums';
 import { CustomError } from '../errors';
 import { errorsMessagesConstant } from '../constants';
-import { PositionToAdd } from '../types';
+import { PositionParamsId, PositionToAdd } from '../types';
 import { IRequestExtended } from '../interfaces';
+import { positionService } from '../services';
 
 class PositionController {
     public async getAll(req: IRequestExtended, res: Response, next: NextFunction): Promise<void> {
@@ -13,9 +14,9 @@ class PositionController {
             const params = req.searchParams;
 
             if (params) {
-                const allPositionsByFilters = await positionRepository.getAllByFilters(params);
+                const allPositionsByFilters = await positionService.searchPositionsByFilters(params);
 
-                if (!allPositionsByFilters) {
+                if (!allPositionsByFilters?.length) {
                     next(new CustomError(errorsMessagesConstant.notFoundPositions, HttpStatusEnum.NOT_FOUND));
                     return;
                 }
@@ -26,7 +27,7 @@ class PositionController {
 
             const positions = await positionRepository.getAll();
 
-            if (!positions) {
+            if (!positions.length) {
                 next(new CustomError(errorsMessagesConstant.notFoundPositions, HttpStatusEnum.NOT_FOUND));
                 return;
             }
@@ -39,9 +40,9 @@ class PositionController {
 
     public async getOne(req: IRequestExtended, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { position_id } = req._id!;
+            const position_id = req._id as PositionParamsId;
 
-            const position = await positionRepository.getOne({ position_id });
+            const position = await positionRepository.getOneById(position_id);
 
             if (!position) {
                 next(new CustomError(errorsMessagesConstant.notFoundPosition, HttpStatusEnum.NOT_FOUND));
@@ -60,7 +61,7 @@ class PositionController {
             const positionCreated = await positionRepository.createOne({ position });
 
             if (!positionCreated) {
-                next(new CustomError(errorsMessagesConstant.notImplementedPosition, HttpStatusEnum.NOT_IMPLEMENTED));
+                next(new CustomError(errorsMessagesConstant.notImplemented, HttpStatusEnum.NOT_IMPLEMENTED));
                 return;
             }
 
@@ -73,12 +74,12 @@ class PositionController {
 
     public async updateOnePartial(req: IRequestExtended, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { position_id } = req._id!;
+            const { position_id } = req._id as PositionParamsId;
             const updatesFields = req.positionToPatch!;
 
             const positionUpdated = await positionRepository.updateField({ position_id, updatesFields });
             if (!positionUpdated) {
-                next(new CustomError(errorsMessagesConstant.notUpdatedPosition, HttpStatusEnum.NOT_IMPLEMENTED));
+                next(new CustomError(errorsMessagesConstant.notUpdated, HttpStatusEnum.NOT_IMPLEMENTED));
                 return;
             }
 
@@ -90,7 +91,7 @@ class PositionController {
 
     public async deleteOne(req: IRequestExtended, res: Response, next: NextFunction): Promise<void> {
         try {
-            const { position_id } = req._id!;
+            const { position_id } = req._id as PositionParamsId;
 
             const positionDeleted = await positionRepository.deleteOne({ position_id });
 

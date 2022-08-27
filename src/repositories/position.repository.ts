@@ -1,12 +1,12 @@
 import { PositionModel } from '../models/Position.model';
 import {
     IDeleteFromDb,
-    IPositionAbstraction, IPositionModel, IPositionToAdd, IPositionToPatch, IQueryParams,
+    IPositionAbstraction, IPositionModel, IPositionToAdd, IPositionToPatch, IQueryParamsPositions,
 } from '../interfaces';
 import { PositionParamsId } from '../types';
 
 class PositionRepository implements IPositionAbstraction {
-    public async createOne(position: IPositionToAdd): Promise<IPositionModel> {
+    public async createOne({ position }: IPositionToAdd): Promise<IPositionModel> {
         return PositionModel.create(position);
     }
 
@@ -14,18 +14,21 @@ class PositionRepository implements IPositionAbstraction {
         return PositionModel.find();
     }
 
-    public async getAllByFilters(params: IQueryParams): Promise<IPositionModel[] | null> {
+    public async getAllByFiltersWithoutTag(params: IQueryParamsPositions): Promise<IPositionModel[] | null> {
+        return PositionModel.find({ ...params });
+    }
+
+    public async getAllByFiltersWithTag(params: IQueryParamsPositions): Promise<IPositionModel[] | null> {
         return PositionModel.find(
             {
-                category: params?.category,
-                level: params?.level,
-                description: { $regex: params?.tag, $options: 'i' },
+                ...params,
+                description: { $regex: params.tag, $options: 'i' },
             },
         );
     }
 
-    public async getOne({ position_id }: PositionParamsId): Promise<IPositionModel | null> {
-        return PositionModel.findOne({ _id: position_id });
+    public async getOneById({ position_id }: PositionParamsId): Promise<IPositionModel | null> {
+        return PositionModel.findById(position_id);
     }
 
     public async updateField({ position_id: _id, updatesFields }: IPositionToPatch): Promise<IPositionModel | null> {

@@ -1,6 +1,6 @@
 import { CategoriesEnum, LevelsEnum } from '../enums';
 
-export interface IQueryParams {
+export interface IQueryParamsPositions {
     category?: CategoriesEnum,
     level?: LevelsEnum,
     tag?: string

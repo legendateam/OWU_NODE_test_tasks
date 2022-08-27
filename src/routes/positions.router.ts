@@ -7,7 +7,7 @@ export const positionsRouter = Router();
 
 positionsRouter.get('/', positionMiddleware.isQueryParams, positionsController.getAll);
 positionsRouter.get('/:position_id', positionMiddleware.checkParamsOnId, positionsController.getOne);
-positionsRouter.post('/', positionMiddleware.positionCreateValidate, positionsController.createOne);
+positionsRouter.post('/', positionMiddleware.createValidate, positionsController.createOne);
 positionsRouter.patch(
     '/:position_id',
     positionMiddleware.checkParamsOnId,

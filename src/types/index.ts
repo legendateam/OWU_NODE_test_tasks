@@ -1,4 +1,5 @@
 export * from './applicant-to-add.type';
+export * from './applicant-params-id.type';
 export * from './applicant-to-add.type';
 export * from './applicant-to-set.type';
 export * from './position.type';

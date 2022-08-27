@@ -4,14 +4,16 @@ import { IRequestExtended } from '../interfaces';
 import {
     PositionParamsId, PositionToAdd, PositionToPatch, QueryParams,
 } from '../types';
-import { positionSearchParams, positionToAddSchema, positionToPatchSchema } from '../utils';
+import {
+    paramsIdSchema, positionSearchParams, positionToAddSchema, positionToPatchSchema,
+} from '../utils';
 import { CustomError } from '../errors';
 import { HttpStatusEnum } from '../enums';
 import { errorsMessagesConstant } from '../constants';
-import { positionRepository } from '../repositories/position.repository';
+import { positionRepository } from '../repositories';
 
 class PositionMiddleware {
-    public positionCreateValidate(req: IRequestExtended, _: Response, next: NextFunction): void {
+    public createValidate(req: IRequestExtended, _: Response, next: NextFunction): void {
         const position = req.body as PositionToAdd;
         const { error, value } = positionToAddSchema.validate(position);
 
@@ -40,8 +42,9 @@ class PositionMiddleware {
     public checkParamsOnId(req: IRequestExtended, _: Response, next: NextFunction): void {
         try {
             const { position_id } = req.params as PositionParamsId;
+            const { error } = paramsIdSchema.validate({ _id: position_id });
 
-            if (!position_id) {
+            if (error) {
                 next(new CustomError(errorsMessagesConstant.missingParams, HttpStatusEnum.BAD_REQUEST));
                 return;
             }
@@ -55,9 +58,9 @@ class PositionMiddleware {
 
     public async checkPositionExists(req: IRequestExtended, _: Response, next: NextFunction): Promise<void> {
         try {
-            const { position_id } = req._id!;
+            const position_id = req._id as PositionParamsId;
 
-            const position = await positionRepository.getOne({ position_id });
+            const position = await positionRepository.getOneById(position_id);
 
             if (!position) {
                 next(new CustomError(errorsMessagesConstant.notFoundPositions, HttpStatusEnum.NOT_FOUND));

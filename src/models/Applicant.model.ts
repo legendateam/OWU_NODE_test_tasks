@@ -1,4 +1,6 @@
-import { getModelForClass, prop, ReturnModelType } from '@typegoose/typegoose';
+import {
+    getModelForClass, prop, ReturnModelType, Severity,
+} from '@typegoose/typegoose';
 
 import { CategoriesEnum, LevelsEnum } from '../enums';
 
@@ -11,10 +13,8 @@ class Applicant {
     public email!: string;
 
     @prop({
+        allowMixed: Severity.ALLOW,
         require: true,
-        trim: true,
-        default: [],
-        lowercase: true,
     })
     public categories!: CategoriesEnum[];
 
